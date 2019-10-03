@@ -13,6 +13,54 @@ var config = {
     measurementId: "G-JKRHHRLJP6"
 };
 
+// Function to fetch user data from google sign in and store to firebase user collection
+
+// This will create a new user if it doesnt exsists in database
+/* Steps
+* #1 :
+* We export the function so it reusable, we will use it in App.js, this is an async function
+* The two parameters are userAuth -> For the user data that returned from google auth
+* additionalData -> Literally any additional data that might be useful
+*
+* #2 :
+* Checking if theres a user logged in or not, by checking is the object a null or not
+*
+* #3 :
+* Getting the user data from database, with certain document path.
+* */
+
+// #1
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+    //#2
+    if(!userAuth){
+        return
+    }
+
+    //#3
+    const userRef = firestore.doc(`users/${userAuth.uid}`);
+    const snapShot = await userRef.get();
+
+    //If the data is not exists in database store a new the document reference
+    if(!snapShot.exists){
+        //Literally create new data in database
+        const{displayName, email} = userAuth;
+        const createdAt = new Date();
+
+        try{
+            await userRef.set({
+                displayName,
+                email,
+                createdAt,
+                ...additionalData
+            })
+        }catch (e) {
+            console.log("error createing user", e.message);
+        }
+    }
+
+    return userRef;
+}
+
 firebase.initializeApp(config);
 
 

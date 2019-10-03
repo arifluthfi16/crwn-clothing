@@ -7,10 +7,7 @@ import {auth} from '../../firebase/firebase.utils';
 import './header.styles.scss';
 
 const Header = ({currentUser}) => {
-    console.log(currentUser);
-
     var signOut;
-
     if(currentUser){
         signOut =
             <div className={'option'} onClick={()=>auth.signOut()}>
